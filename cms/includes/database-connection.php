@@ -1,7 +1,7 @@
 <?php
 $type = 'mysql';
-$server = 'localhost';
-$db = "phpbook-1";
+$server = '127.0.0.1';
+$db = "phpmysqlbook";
 $port = '3004';
 $charset = 'utf8mb4';
 
