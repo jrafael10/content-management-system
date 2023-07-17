@@ -45,6 +45,5 @@ $description = 'A collective of creatives for hire'; // Meta description content
     <?php } ?>
 </main>
 
-
 <?php include 'includes/footer.php'; ?>
 
