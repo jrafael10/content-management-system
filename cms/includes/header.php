@@ -29,6 +29,9 @@
                               <?= html_escape($link['name']) ?>
                             </a></li>
                         <?php } ?>
+                        <li><a href="search.php">
+                                <span class="icon-search"></span><span class="search-text">Search</span>
+                            </a></li>
                     </ul>
                 </nav>
 
