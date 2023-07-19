@@ -17,6 +17,10 @@ $description = '';                                      // Meta description cont
     <a href="mailto:hello@eg.link">hello@eg.link</a></p>
 
 </main>
+<?php
+require_once 'includes/footer.php';
+exit;
+?>
 
 
 
