@@ -62,7 +62,7 @@ $description = $title . ' on Creative Folk';                 // Meta description
     </main>
 <?php include 'includes/footer.php'; ?>
 
-fd
+
 
 
 
