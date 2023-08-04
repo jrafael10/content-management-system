@@ -24,6 +24,16 @@ function format_date(string $string):string
     return $date->format('F d, Y');                     //Return in format Jan 31, 2023
 }
 
+//UTILITY FUNCTIONS
+
+function redirect(string $location, array $parameters = [], $response_code = 302)
+{
+    $qs = $parameters ? '?' . http_build_query($parameters) : ''; //Create query string
+    $location = $location .$qs;                                 //Create new Path
+    header('Location: ' . $location, $response_code ); // Redirect to new page
+    exit;
+}
+
 
 
 
