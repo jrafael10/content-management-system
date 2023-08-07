@@ -73,7 +73,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {  //If form submitted
                 throw $e;
             }
         }
-        
+
     }
 }
 
@@ -83,7 +83,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {  //If form submitted
 <?php include '../includes/admin-header.php'; ?>
 <main class="container admin" id="content">
     <form action="category.php?id=<?= $id ?>" method="post" class="narrow">
+        <?php if ($id){ ?>
         <h1>Edit Category</h1>
+        <?php } else { ?>
+        <h1>Add Category</h1>
+        <?php } ?>
         <?php if($errors['warning']) { ?>
             <div class="alert alert-danger"><?= $errors['warning'] ?></div>
         <?php } ?>
