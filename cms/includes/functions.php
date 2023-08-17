@@ -34,6 +34,22 @@ function redirect(string $location, array $parameters = [], $response_code = 302
     exit;
 }
 
+function create_filename(string $filename): string
+{
+    $basename = pathinfo($filename, PATHINFO_FILENAME);
+    $extension = pathinfo($filename, PATHINFO_EXTENSION);
+    $cleanname = preg_replace("/[^A-z0-9]/", "-", $basename); //clean basename
+    $filename = $cleanname . '.' . $extension; //Destination
+    $i = 0;                                     //Counter
+    while(file_exists($filename)) {
+        $i = $i +1;
+        $filename = $cleanname . $i . "." . $extension;
+    }
+    return  $filename;
+}
+
+
+
 
 
 
