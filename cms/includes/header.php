@@ -34,10 +34,6 @@
                             </a></li>
                     </ul>
                 </nav>
-
-
-
             </div>
-
         </header>
 

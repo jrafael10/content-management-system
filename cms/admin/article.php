@@ -79,7 +79,7 @@ $categories = pdo($pdo, $sql)->fetchAll();             //Get all categories
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
     // If file bigger than limit in php.ini or .htaccess store error message
-    $errors['image_file'] = ($_FILES['image']['error'] === 1) ? 'Files too big ' : '';
+    $errors['image_file'] = ($_FILES['image']['error'] === 1) ? 'Files too big' : '';
     // If image was uploaded, get image data and validate
     if($temp and $_FILES['image']['error'] === 0) {                 //If file uploaded and no error
         $article['image_alt'] = $_POST['image_alt'];                //Get all text
@@ -114,8 +114,64 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
     $errors['member'] = is_member_id($article['member_id'], $authors  ) ? '' : 'Please select an author';
     $errors['category'] = is_category_id($article['category_id'], $categories) ? '' : 'Please select a category';
 
-    $invalid = implode($errors);
+    $invalid = implode($errors);                                        // Join errors
+    //Part C: Check if data is valid, if so update database
+    if($invalid) {                                               //If invalid
+        $errors['warning'] = 'Please correct the errors below';  //Store message
+    } else {                                                     //otherwise
+        $arguments = $article;                                  //Save data as $arguments
+        try {                                                   //Try to insert data
+            $pdo->beginTransaction();                           //Start transaction
+            if($destination) {                                  //If have valid image
+                // Crop and save file
+                $imagick = new Imagick($temp);                  //Object to represent image
+                $imagick->cropThumbnailImage(1200, 700);  //Create cropped image
+                $imagick->writeImage($destination);                 //Save file
 
+                $sql = "INSERT INTO image(file, alt) VALUES(:file, :alt)"; //SQL to add image
+
+                // Run SQL to add image to image table
+                pdo($pdo, $sql, [$arguments['image_file'], $arguments['image_alt'], ]);
+                $arguments['image_id'] = $pdo->lastInsertId();
+            }
+            unset($arguments['image_file'], $arguments['image_alt']); //Cut image data
+
+            if($id) {
+                $sql = "UPDATE article 
+                            SET title = :title, summary = :summary, content = :content, 
+                                category_id = :category_id, member_d = :member_id, 
+                                image_id = :image_id, published =:published
+                         WHERE id=:id;";                            //SQL to update article
+            } else {
+                unset($arguments['id']);
+                $sql = "INSERT INTO article(title, summary, content, category_id, 
+                                    member_id, image_id, published)
+                              VALUES(:title, :summary, :content, :category_id, :member_id, 
+                                     :image_id, :published);";          //SQL to create article
+            }
+
+
+            // When running the SQL, three things can happen:
+            // Article saved | Title already in use | Exception thrown for other reason
+            pdo($pdo, $sql, $arguments);            // Run SQL to add article
+            $pdo->commit();
+            //Commit changes
+            redirect('articles.php', ['success' => 'Article saved']); //Redirect
+        } catch(Exception $e) {                                     //If exception thrown
+            $pdo->rollBack();                                       //Roll back SQL changes
+            if(file_exists($destination)){
+                unlink($destination);
+            }
+            // If the exception was a PDOException and it was an integrity constraint
+            if(($e instanceof PDOException) and ($e->errorInfo[1] === 1062)) {
+               $errors['warning'] = 'Article name already in use';      //Store warning
+            }else {                                                     //Otherwise
+                throw $e;                                               //Rethrow exception
+            }
+        }
+    }
+
+    $article['image_file'] = $saved_image ? $article['image_file'] : '';
 }
 
 ?>
@@ -157,37 +213,47 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
                     <label for="title">Title: </label>
                     <input type="text" name="title" id="title" value="<?= html_escape($article['title']) ?>"
                            class="form-control">
-                    <span class="errors"<?= $errors['title'] ?>></span>
+                    <span class="errors"><?= $errors['title'] ?></span>
                 </div>
                 <div class="form-group">
                     <label for="summary">Summary: </label>
                     <textarea name="summary" id="summary"
-                              class="form-control"></textarea>
-                    <span class="errors"></span>
+                              class="form-control"><?= html_escape($article['summary']) ?></textarea>
+                    <span class="errors"><?= $errors['summary'] ?></span>
                 </div>
                 <div class="form-group">
                     <label for="content">Content: </label>
                     <textarea name="content" id="content"
-                              class="form-control"></textarea>
-                    <span class="errors"></span>
+                              class="form-control"><?= html_escape($article['content']) ?></textarea>
+                    <span class="errors"><?= $errors['content'] ?></span>
                 </div>
                 <div class="form-group">
                     <label for="member_id">Author: </label>
                     <select name="member_id" id="member_id">
-                        <option value="">
-                        </option>
+                        <?php foreach ($authors as $author) {?>
+                            <option value="<?= $author['id'] ?>"
+                                <?= ($article['member_id'] == $author['id']) ? 'selected' : '';  ?>>
+                                <?= html_escape($author['forename']. ' ' . $author['surname']) ?></option>
+
+                        <?php } ?>
+
 
                     </select>
-                    <span class="errors"></span>
+                    <span class="errors"><?= $errors['member'] ?></span>
                 </div>
                 <div class="form-group">
                     <label for="category">Category: </label>
                     <select name="category_id" id="category">
+                        <?php foreach ($categories as $category) {  ?>
+                            <option value="<?= $category['id'] ?>"
+                                <?= ($article['category_id'] == $category['id']) ? 'selected' : ''; ?>>
+                                <?= html_escape($category['name']) ?>
+                            </option>
 
-                        <option value=""></option>
+                        <?php } ?>
 
                     </select>
-                    <span class="errors"></span>
+                    <span class="errors"><?= $errors['category'] ?></span>
                 </div>
                 <div class="form-check">
                     <input type="checkbox" name="published" value="1" class="form-check-input" id="published">
