@@ -8,7 +8,10 @@ include '../includes/database-connection.php'; //Database connection
 include '../includes/functions.php';        //Functions
 include '../includes/validate.php';       // Validate functions
 //File upload settings
-$uploads = dirname(__DIR__, 1). DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;  // Image upload folder
+$uploads = dirname(
+        __DIR__,
+        1
+    ) . DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR;  // Image upload folder
 $file_types = ['image/jpeg', 'image/png', 'image/gif'];             // Allowed file types
 $file_extensions = ['jpg', 'jpeg', 'png', 'gif'];               //Allowed Extensions
 $max_size = '5242880';                                          //Max file size

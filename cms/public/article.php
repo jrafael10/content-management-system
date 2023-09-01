@@ -46,7 +46,7 @@ $description = $article['summary'];                      //Meta description cont
         <div class="date"><?= format_date($article['created']) ?></div>
         <div class="content"><?= html_escape($article['content']) ?></div>
         <p class="credit">
-            Posted in <a href="category.php?id=<?= $article['category_id'] ?>"><?= html_escape($article['category']) ?></a> by <a href="member.php?id=<?= $article['member_id'] ?>">
+            Posted in <a href="category.php?id=<?= $article['category_id'] ?>"><?= html_escape($article['category']) ?></a>by <a href="member.php?id=<?= $article['member_id'] ?>">
                 <?= html_escape($article['author']) ?></a>
         </p>
     </section>

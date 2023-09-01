@@ -12,7 +12,8 @@ $categories = pdo($pdo, $sql)->fetchAll();
 
 ?>
 
-<?php include '../includes/admin-header.php' ?>
+<?php
+include '../includes/admin-header.php' ?>
 
 <main class="container" id="content">
     <section class="header">
