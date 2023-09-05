@@ -48,7 +48,32 @@ function create_filename(string $filename): string
     return  $filename;
 }
 
+// ERROR AND EXCEPTION HANDLING FUNCTIONS
+// Convert errors to exceptions
 
+function handle_error($error_type, $error_message, $error_file, $error_line){
+    throw new ErrorException($error_message, 0, $error_type, $error_file, $error_line); //Turn into ErrorException
+
+}
+
+// Handle exceptions - log exception and show error message (if server does not send error page listed in .htaccess)
+function handle_exception($e)
+{
+    error_log($e);
+    http_response_code(500);
+    echo "<h1>Sorry, a problem occurred</h1>   
+          The site's owners have been informed. Please try again later.";
+}
+
+/*function handle_shutdown()
+{
+    $error = error_get_last(); //Check for error in script
+    if($error !== null) {
+
+    }
+}
+
+*/
 
 
 

@@ -27,8 +27,3 @@ define('FILE_EXTENSIONS', ['jpeg', 'jpg', 'png', 'gif',]); // Allowed file exten
 define('FILE_EXTENSIONS',['jpeg', 'jpg', 'png', 'gif',] ); //ALlowed file extensions
 define('MAX_SIZE', '5242880');                      //Max file size
 
-
-echo dirname(__DIR__, 1)  . '</br>';
-echo $_SERVER['DOCUMENT_ROOT'] . '</br>';
-echo $this_folder . '</br>';
-echo $parent_folder;
