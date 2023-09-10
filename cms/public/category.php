@@ -1,37 +1,20 @@
 <?php
 declare(strict_types=1);                                //Use strict types
-require 'includes/database-connection.php';             //Create PDO object
-require 'includes/functions.php';                       //Include functions
+include  '../src/bootstrap.php';                        // Setup file
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validate id
-if(!$id) {
-    include 'page-not-found.php';
+if(!$id) {                                              //If id was not an integer
+    include APP_ROOT . '/public/page-not-found.php';      //Page not found
 }
 
-$sql = "SELECT id, name, description FROM category WHERE id=:id;"; // SQL statement
-$category = pdo($pdo, $sql, [$id])->fetch();                    //Get category data
-
-if(!$category) {                                                //If category not found
-    include 'page-not-found.php';                               //Page not found
+$category = $cms->getCategory()->get($id);                       // Get category data
+if(!$category) {                                                //If category is empty
+    include APP_ROOT . '/public/page-not-found.php';            //Page not found
 }
 
-$sql = "SELECT a.id, a.title, a.summary, a.category_id, a.member_id,
-               c.name AS category,
-               CONCAT(m.forename, ' ', m.surname) AS author,
-               i.file AS image_file,
-               i.alt AS image_alt
-          FROM article      AS a
-          JOIN category     AS c    ON a.category_id = c.id
-          JOIN member       AS m    ON a.member_id = m.id
-          LEFT JOIN image AS i      ON a.image_id = i.id
-          WHERE a.category_id = :id AND a.published =1
-          ORDER BY a.id DESC;";
 
-$articles = pdo($pdo, $sql, [$id])->fetchAll();                     //SQL statement
-                                                                    //Get articles
-
-$sql = "SELECT id, name FROM category WHERE navigation = 1;";       // SQL to get categories
-$navigation = pdo($pdo, $sql)->fetchAll();                      //Get navigation categories
+$articles = $cms->getArticle()->getAll(true, $id);                 //Get articles
+$navigation = $cms->getCategory()->getAll();                      //Get navigation categories
 $section = $category['id'];                                     //Current category
 $title = $category['name'];                                     //HTML <title> content
 $description = $category['description'];                        //Meta description content

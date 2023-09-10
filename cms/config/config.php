@@ -24,6 +24,6 @@ $dsn = "$type:host=$server;dbname=$db;port=$port;charset=$charset"; //Create DSN
 define('UPLOADS', dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR); //Image upload folder
 define('MEDIA_TYPES', ['image/jpeg', 'image/png', 'image/gif', ]); // Allowed file types
 define('FILE_EXTENSIONS', ['jpeg', 'jpg', 'png', 'gif',]); // Allowed file extensions
-define('FILE_EXTENSIONS',['jpeg', 'jpg', 'png', 'gif',] ); //ALlowed file extensions
+//define('FILE_EXTENSIONS',['jpeg', 'jpg', 'png', 'gif',] ); //ALlowed file extensions
 define('MAX_SIZE', '5242880');                      //Max file size
 
