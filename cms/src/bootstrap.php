@@ -16,6 +16,7 @@ spl_autoload_register(function($class)          //Set autoload function
 {
     $path = APP_ROOT . '/src/classes/';         //Path to class definition
     require $path . $class . '.php';            //Include class definition
+
 });
 
 $cms = new CMS($dsn, $username, $password);    //Create CMS object

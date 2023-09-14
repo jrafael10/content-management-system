@@ -29,6 +29,14 @@ class Category
 
     }
 
+    //ADMIN METHODS
+    // Get number of categories
+    public function count(): int
+    {
+        $sql = "SELECT COUNT(id) FROM category;";  //SQL to count categories
+        return $this->db->runSQL($sql)->fetchColumn();
+    }
+
 
 
 

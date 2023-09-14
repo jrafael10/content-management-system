@@ -1,7 +1,8 @@
 <?php
 declare(strict_types = 1);                                // Use strict types
 require 'includes/database-connection.php';               // Create PDO object
-require 'includes/functions.php';                         // Include functions
+//  require 'includes/functions.php';                         // Include functions
+include '../src/bootstrap.php';
 
 $term = filter_input(INPUT_GET, 'term');  //Get search term
 $show = filter_input(INPUT_GET, 'show', FILTER_VALIDATE_INT) ?? 3; //LIMIT
@@ -10,39 +11,11 @@ $count = 0;                                             //Set count to 0
 $articles = [];                                         //Set articles to empty array
 
 if($term) {                                     //If search term provided
-    $arguments['term1'] = '%' . $term . '%';    //Store search term in array
-    $arguments['term2'] = '%' . $term . '%';    //Three times as PLACEHOLDERS
-    $arguments['term3'] = '%' . $term . '%';    // Cannot be repeated in SQL
-
-    $sql = "SELECT COUNT(title) FROM article
-            WHERE  title   LIKE :term1
-                OR summary LIKE :term2
-                OR content LIKE :term3
-               AND published = 1;";             //How many articles match term
-    $count = pdo($pdo, $sql, $arguments)->fetchColumn();  //Return count
+    $count = $cms->getArticle()->searchCount($term);
 
     if($count > 0) {                                  //If articles match term
-        $arguments['show'] = $show;                   //Add to array for pagination
-        $arguments['from'] = $from;                    //Add to array for pagination
 
-        $sql ="SELECT a.id, a.title, a.summary, a.category_id, a.member_id,
-                   c.name AS category,
-                   CONCAT(m.forename, ' ', m.surname) AS author,
-                   i.file        AS image_file,
-                   i.alt         AS image_alt
-               FROM article     AS a
-               JOIN category    AS c  ON a.category_id = c.id
-               JOIN member      AS m  ON a.member_id = m.id
-               LEFT JOIN image  AS i  ON a.image_id = i.id
-               WHERE a.title   LIKE :term1
-                  OR a.summary LIKE :term2
-                  OR a.content LIKE :term3
-                 AND a.published = 1
-               ORDER BY a.id DESC
-                  LIMIT  :show
-                  OFFSET :from;";                           //Find matching articles
-
-        $articles = pdo($pdo, $sql, $arguments)->fetchAll(); //Run query and get results
+        $articles = $cms->getArticle()->search($term, $show, $from);    //Get matches
     }
 }
 
@@ -51,8 +24,7 @@ if($count > $show) {                                //If matches more than show
     $current_page = ceil($from/$show) + 1; //Calculate current page
 }
 
-$sql = "SELECT id, name FROM category WHERE navigation = 1;";  //SQL to get categories
-$navigation = pdo($pdo, $sql)->fetchAll();                  //Get navigation categories
+$navigation = $cms->getCategory()->getAll();                //Get categories
 $section = '';                                              //Current category
 $title = 'Search results for ' . $term;                     //HTML <title> content
 $descriotion = $title . ' on Creative Folk';                //Meta description content

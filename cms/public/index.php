@@ -1,33 +1,15 @@
 <?php
 declare(strict_types  = 1);         //Use strict types
-require 'includes/database-connection.php';   //Create PDO object
-require 'includes/functions.php'; //Include functions
+include '../src/bootstrap.php';
 
-$sql = "SELECT a.id, a.title, a.summary, a.category_id, a.member_id,
-               c.name AS category,
-               CONCAT(m.forename, ' ', m.surname) AS author,
-               i.file AS image_file,
-               i.alt AS image_alt
-          FROM article AS a
-          JOIN category AS c ON a.category_id = c.id
-          JOIN member AS m ON a.member_id = m.id
-          LEFT JOIN image AS i ON a.image_id = i.id
-          WHERE a.published = 1
-        ORDER BY a.id DESC
-        LIMIT 6;";                             // SQL to get latest articles
+$articles = $cms->getArticle()->getAll(true, null, null, 6); //Get latest article summaries
 
-$articles = pdo($pdo, $sql)->fetchAll();           // Get summaries
-
-$sql = "SELECT id, name FROM category WHERE navigation = 1;";    // SQL to get categories
-$navigation = pdo($pdo, $sql)->fetchAll();                 //Get navigation categories
-
-$section = '';                                      // Current category
-$title = 'Creative Folk';                           // HTML <title> content
+$navigation = $cms->getCategory()->getAll();            //Get categories
+$section    = '';                                      // Current category
+$title      = 'Creative Folk';                          // HTML <title> content
 $description = 'A collective of creatives for hire'; // Meta description content
-
 ?>
-<?php include 'includes/header.php'; ?>
-
+<?php include APP_ROOT . '/public/includes/header.php'; ?>
 <main class="container grid" id="content">
     <?php foreach ($articles as $article){ ?>
         <article class="summary">
@@ -45,5 +27,5 @@ $description = 'A collective of creatives for hire'; // Meta description content
     <?php } ?>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include APP_ROOT .'/public/includes/footer.php' ?>
 

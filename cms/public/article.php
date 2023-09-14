@@ -1,34 +1,19 @@
 <?php
 declare(strict_types = 1);                      //Use strict types
-require 'includes/database-connection.php';     //Create PDO object
-require 'includes/functions.php';               //Include functions
+include '../src/bootstrap.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validate id
 
-if(!$id) {                                       //if no valid id
-    include 'page-not-found.php';               //Page not found
+if(!$id) {                                          //if no valid id
+    include APP_ROOT . '/public/page-not-found.php'; //Page not found
 }
 
-$sql = "SELECT a.title, a.summary, a.content, a.created, a.category_id, a.member_id,
-               c.name AS category,
-               CONCAT(m.forename, ' ', m.surname) AS author,
-               i.file AS image_file,
-               i.alt AS image_alt
-        FROM article    AS a
-        JOIN category   AS c ON a.category_id = c.id
-        JOIN member     AS m ON a.member_id   = m.id
-        LEFT JOIN image AS i ON a.image_id    = i.id
-        WHERE a.id = :id AND a.published = 1;"; //SQL statement
-
-$article = pdo($pdo, $sql, [$id])->fetch();         //Get article data
-
+$article = $cms->getArticle()->get($id);            //Get article data
 if(!$article) {                                     //If article not found
-    include 'page-not-found.php';                   //Page not found
+    include APP_ROOT . '/public/page-not-found.php'; //Page not found
 }
 
-
-$sql = "SELECT id, name FROM category WHERE navigation=1"; //SQL to get Categories
-$navigation = pdo($pdo, $sql)->fetchAll();                  //Get navigation categories
+$navigation = $cms->getCategory()->getAll();            // Get categories
 $section = $article['category_id'];                     //current category
 $title = $article['title'];                             //HTML <title> content
 $description = $article['summary'];                      //Meta description content

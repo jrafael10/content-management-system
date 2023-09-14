@@ -1,39 +1,26 @@
 <?php
 declare(strict_types = 1);                                 // Use strict types
-require 'includes/database-connection.php';                // Create PDO object
-require 'includes/functions.php';                          // Include functions
+include '../src/bootstrap.php';                          // Setup file
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if(!$id){                                                   //If no valid id
-    include 'page-not-found.php';                           //Page not found
+    include APP_ROOT . '/public/page-not-found.php';        //Page not found
+    //include 'page-not-found.php';                           //Page not found
 }
 
-$sql = "SELECT forename, surname, joined, picture FROM member WHERE id = :id"; //SQL
-$member = pdo($pdo, $sql, [$id])->fetch();                          //GET member data
+$member = $cms->getMember()->get($id);                           //GET member data
 
-if(!$member){                                                       //If array is empty
-    include 'page-not-found.php';                                   //Page not found
+if(!$member){                                                   //If array is empty
+    include APP_ROOT . '/public/page-not-found.php';           //Page not found
 }
+$articles =$cms->getArticle()->getAll(true, null, $id);     // Get member's articles
 
-$sql = "SELECT a.id, a.title, a.summary, a.category_id, a.member_id,
-               c.name AS category,
-               CONCAT(m.forename, ' ', m.surname) AS author,
-               i.file AS image_file,
-               i.alt  AS image_alt
-        FROM article  AS a 
-        JOIN category AS c ON a.category_id = c.id
-        JOIN member   AS m ON a.member_id   = m.id
-        LEFT JOIN image AS i ON a.image_id  = i.id
-        WHERE a.member_id = :id AND a.published = 1
-        ORDER BY a.id DESC;";                                   //SQL
-$articles = pdo($pdo, $sql,[$id])->fetchAll();                   //Member's articles
-$sql = "SELECT id, name FROM category WHERE navigation = 1;";    //SQL to get categories
-$navigation = pdo($pdo, $sql)->fetchAll();                       //Get categories
+$navigation = $cms->getCategory()->getAll();                //Get categories
 $section = '';                                                  //Current category
 $title = $member['forename'] . ' ' . $member['surname'];        //HTML <title> content
 $description = $title . ' on Creative Folk';                 // Meta description
 ?>
-<?php include 'includes/header.php'; ?>
+<?php include  APP_ROOT . '/public/includes/header.php';?>
     <main class="container" id="content">
         <section class="header">
             <h1><?=html_escape($member['forename'] . ' ' . $member['surname']) ?></h1>
@@ -60,7 +47,7 @@ $description = $title . ' on Creative Folk';                 // Meta description
             <?php } ?>
         </section>
     </main>
-<?php include 'includes/footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/footer.php'; ?>
 
 
 
