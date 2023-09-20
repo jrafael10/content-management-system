@@ -10,7 +10,6 @@ class Database extends PDO
         $default_options[PDO::ATTR_ERRMODE]            = PDO::ERRMODE_EXCEPTION; //Error settings
         $options = array_replace($default_options, $options); //Replace defaults if supplied
         parent::__construct($dsn, $username, $password, $options); //Create PDO object
-
     }
 
     public function runSQL(string $sql, $arguments = null)

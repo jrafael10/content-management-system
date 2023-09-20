@@ -111,6 +111,112 @@ class Article
     }
 
     // ADMIN METHODS
+
+    public function count():int
+    {
+        $sql = "SELECT COUNT(id) FROM article;";        //SQL to count article
+        return $this->db->runSQL($sql)->fetchColumn();  // Return count from result set
+    }
+
+    public function create(array $article, string $temporary, string $destination):bool
+    {
+        try {                                   //try to insert data
+            $this->db->beginTransaction();      //start transaction
+            if($destination) {                  //if have valid image
+                //Crop and save file
+                $imagick = new Imagick($temporary); //Object to represent image
+                $imagick->cropThumbnailImage(1200, 700); //Create cropped image
+                $imagick->writeImage($destination);     //Save file
+
+                $sql = "INSERT INTO image (file, alt)
+                        VALUE (:file, :alt);";      //SQL to add image
+                $this->db->runSQL($sql, [$article['image_file'], $article['image_alt']]); //Add image to table
+                $article['image_id'] = $this->db->lastInsertId(); //Return image id
+            }
+            unset($article['image_file'], $article['image_alt']);
+            $sql = "INSERT INTO article (title, summary, content, category_id, member_id, 
+                     image_id, published)
+                    VALUES(:title, :summary, :content, :category_id, :member_id,
+                           :image_id, :published);";         //SQL to add article
+
+            $this->db->runSQL($sql, $article);              //Add article
+            $this->db->commit();                            //Commit transaction
+            return true;                                    //Return true;
+        } catch (Exception $e) {                            //If exception was raised
+            $this->db->rollBack();                  //Rollback transaction
+            if(file_exists($destination)){          //If image file exists
+                unlink($destination);               //Delete image file
+            }
+            if(($e instanceof PDOException) and ($e->errorInfo[1] === 1062)) { // If error is integrity constraint
+                return false;
+            } else {
+                throw $e;
+            }
+
+        }
+    }
+
+
+    public function update(array $article, string $temporary, string $destination): bool
+    {
+        try {                                   //try to insert data
+            $this->db->beginTransaction();      //start transaction
+            if($destination) {                  //if have valid image
+                //Crop and save file
+                $imagick = new Imagick($temporary); //Object to represent image
+                $imagick->cropThumbnailImage(1200, 700); //Create cropped image
+                $imagick->writeImage($destination);     //Save file
+
+                $sql = "INSERT INTO image (file, alt)
+                        VALUE (:file, :alt);";      //SQL to add image
+                $this->db->runSQL($sql, [$article['image_file'], $article['image_alt']]); //Add image to image table
+                $article['image_id'] = $this->db->lastInsertId(); //Add image id to $article
+            }
+            // Remove unwanted elements from $article
+            unset($article['category'], $article['created'], $article['author'], $article['image_file'], $article['image_alt']);
+            $sql = "UPDATE article SET title = :title, summary = :summary, content = :content,
+                           category_id = :category_id, member_id = :member_id,
+                           image_id = :image_id, published = :published
+                    WHERE id = :id;";                       //SQL statement
+            $this->db->runSQL($sql, $article)->rowCount();              //Add article
+            $this->db->commit();                            //Commit transaction
+            return true;                                    //Return true;
+        } catch (Exception $e) {                            //If exception was raised
+            $this->db->rollBack();                  //Rollback transaction
+            if(file_exists($destination)){          //If image file exists
+                unlink($destination);               //Delete image file
+            }
+            if(($e instanceof PDOException) and ($e->errorInfo[1] === 1062)) { // If error is integrity constraint
+                return false;
+            } else {
+                throw $e;
+            }
+
+        }
+    }
+
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM article WHERE id = :id;"; //SQL statement
+        $this->db->runSQL($sql, [$id]);             //Delete article
+        return true;                                //Return true
+    }
+
+    public function imageDelete(int $image_id, string $path, int $article_id)
+    {
+        $sql = "UPDATE article SET image_id = null
+                WHERE id = :article_id;";               //SQL statement
+        $this->db->runSQL($sql, [$article_id]);         //Delete image from article
+        $sql = "DELETE FROM image WHERE id = :id;";     //SQL statement
+        $this->db->runSQL($sql,[$image_id]);            //Delete image from image
+
+        if(file_exists($path)){                         //If image file exists
+            unlink($path);                              //Delete image file
+        }
+    }
+
+
+
     public function altUpdate(int $image_id, string $alt)
     {
         $sql = "UPDATE image SET alt = :alt

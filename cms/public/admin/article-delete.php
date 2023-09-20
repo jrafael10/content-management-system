@@ -1,29 +1,21 @@
 <?php
 declare(strict_types = 1);                      //Use strict types
-include '../includes/database-connection.php'; //Database connection
-include '../includes/functions.php';            //Include functions
+include '../../src/bootstrap.php';
+$deleted = null;
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); //Validate id
 if(!$id) {
     redirect('articles.php', ['failure' => 'Article not found']); //Redirect with error
 }
-$article = false;                           //Initialize article
-$sql = "SELECT a.title, a.image_id,
-               i.file AS image_file
-         FROM article AS a
-         LEFT JOIN image AS i ON a.image_id = i.id
-         WHERE a.id = :id;";                     //SQL to get article data
-$article = pdo($pdo, $sql, [$id])->fetch();     //Get article data
-echo "<pre>";
-print_r($article);
-echo "</pre>";
+
+$article =$cms->getArticle()->get($id, false);
 
 if (!$article) {                                          // If $article empty
     redirect('articles.php', ['failure' => 'Article not found']); // Redirect
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
-    try {
+    /*try {
         $pdo->beginTransaction();                   //Start transaction
 
         // If there is an image, delete the image first
@@ -45,13 +37,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
         $pdo->rollBack();                                       //Roll back SQL changes
         throw $e;                                               //Re-throw exception
     }
+    */
 
+    if(isset($article['image_id'])) {                                 // If there was an image
+        $path = APP_ROOT . '/public/uploads/' . $article['image_file'];  //Set the image path
+        $cms->getArticle()->imageDelete($article['image_id'], $path, $id);  //Delete image
+    }
+    $deleted = $cms->getArticle()->delete($id);             //Delete article
+    if($deleted  === true) {
+        redirect('admin/articles.php', ['success' => 'Article deleted']); // Redirect
+    } else {
+        throw new Exception('Unable to delete article');        //Throw an exception
+    }
 }
 
 
 
 ?>
-<?php include '../includes/admin-header.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php'; ?>
 
 <main class="container admin" id="content">
     <form action="article-delete.php?id=<?= $id ?>" method="POST" class="narrow">
@@ -63,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
 
 </main>
 
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>
 
 
 

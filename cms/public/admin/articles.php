@@ -1,25 +1,26 @@
 <?php
 declare(strict_types=1);                        //Use strict types
-include '../includes/database-connection.php'; // Database connection
-include '../includes/functions.php';            //Functions
+include '../../src/bootstrap.php';                       // Include setup file
 
 $success = $_GET['success'] ?? null;          //Check for success message
 $failure = $_GET['failure'] ?? null;           //Check for failure message
 
-$sql = "SELECT a.id, a.title, a.summary, a.created, a.category_id, a.member_id, a.published,
+/*$sql = "SELECT a.id, a.title, a.summary, a.created, a.category_id, a.member_id, a.published,
                 c.name     AS category,
                 CONCAT(m.forename, ' ',m.surname) AS author,
                 i.file    AS image_file,
                 i.alt      AS image_alt
            FROM article    AS a
-           JOIN category   AS c ON a.category_id = c.id 
-           JOIN member     AS m ON a.member_id = m.id  
+           JOIN category   AS c ON a.category_id = c.id
+           JOIN member     AS m ON a.member_id = m.id
            LEFT JOIN image AS i ON a.image_id  =i.id
            ORDER BY a.id DESC;";                //SQL to get article summaries
-$articles = pdo($pdo, $sql)->fetchAll();        //Get article summaries
+$articles = pdo($p
+*/
+$articles = $cms->getArticle()->getAll(0);               //Get article summaries
 
 ?>
-<?php include '../includes/admin-header.php'; ?>
+<?php include  APP_ROOT . '/public/includes/admin-header.php'; ?>
 
 <main class="container" id="content">
     <section class="header">
@@ -48,7 +49,7 @@ $articles = pdo($pdo, $sql)->fetchAll();        //Get article summaries
 
 </main>
 
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>
 
 
 

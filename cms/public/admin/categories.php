@@ -1,19 +1,15 @@
 <?php
 declare(strict_types = 1);                             // Use strict types
-include '../includes/database-connection.php';         // Database connection
-include '../includes/functions.php';                   //Functions
+include '../../src/bootstrap.php';                      //Include setup file
 
 $success = $_GET['success'] ?? null;
 $failure = $_GET['failure'] ?? null;
 
-$sql = "SELECT id, name FROM category;";
-$categories = pdo($pdo, $sql)->fetchAll();
-
+$categories = $cms->getCategory()->getAll();            //Get all categories
 
 ?>
 
-<?php
-include '../includes/admin-header.php' ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php' ?>
 
 <main class="container" id="content">
     <section class="header">
@@ -47,7 +43,7 @@ include '../includes/admin-header.php' ?>
 
     </table>
 </main>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>
 
 
 

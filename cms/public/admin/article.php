@@ -1,25 +1,14 @@
 <?php
 
 //Part A: Setup
-declare(strict_types = 1);
-
-//Use strict types
-include '../includes/database-connection.php'; //Database connection
-include '../includes/functions.php';        //Functions
-include '../includes/validate.php';       // Validate functions
-//File upload settings
-$uploads = dirname(
-        __DIR__,
-        1
-    ) . DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR;  // Image upload folder
-$file_types = ['image/jpeg', 'image/png', 'image/gif'];             // Allowed file types
-$file_extensions = ['jpg', 'jpeg', 'png', 'gif'];               //Allowed Extensions
-$max_size = '5242880';                                          //Max file size
+declare(strict_types = 1);//Use strict types
+include '../../src/bootstrap.php';      //Include setup file
 
 // Initialize variables that the PHP code needs
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);  // Get id + validate
 $temp = $_FILES['image']['tmp_name'] ?? '';   //Temporary image
 $destination = '';                          //Where to save file
+$saved = null;
 
 // Initialize variables that the HTML page needs
 $article = [
@@ -49,55 +38,37 @@ $errors = [
 
 // If there was an id, page is editing an article, so get current article data
 if($id) {
-    $sql = "SELECT a.id, a.title, a.summary, a.content,
-                   a.category_id, a.member_id, a.image_id, a.published,
-                   i.file AS image_file,
-                   i.alt AS image_alt
-             FROM article as a
-             LEFT JOIN image AS i ON a.image_id = i.id
-             WHERE a.id = :id";
-
-    $article = pdo($pdo, $sql, [$id])->fetch();
+    $article =  $cms->getArticle()->get($id, false);
 
     if(!$article){                                                  //If article empty
-        redirect('articles.php', ['failure' => 'Article not found']); //Redirect
+        redirect('admin/articles.php', ['failure' => 'Article not found']); //Redirect
     }
-
 }
 
-//echo '<pre>';
-//print_r($article);
-//echo '</pre>';
-
 $saved_image = $article['image_file'] ? true :  false; //Has an image been uploaded
-
-//Get all members and all categories
-$sql = "SELECT id, forename, surname FROM member;";    //SQL to get all members
-$authors = pdo($pdo, $sql)->fetchAll();                 //Get all members
-
-$sql = "SELECT id, name FROM category;";              //SQL to get all categories
-$categories = pdo($pdo, $sql)->fetchAll();             //Get all categories
+$authors = $cms->getMember()->getAll();        //Get all members
+$categories = $cms->getCategory()->getAll();
 
 // Part B: Get and validate form data
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
     // If file bigger than limit in php.ini or .htaccess store error message
-    $errors['image_file'] = ($_FILES['image']['error'] === 1) ? 'Files too big' : '';
+    $errors['image_file'] = ($_FILES['image']['error'] === 1) ? 'File too big ' : '';
     // If image was uploaded, get image data and validate
-    if($temp and $_FILES['image']['error'] === 0) {                 //If file uploaded and no error
+    if($temp and $_FILES['image']['error'] == 0) {                 //If file uploaded and no error
         $article['image_alt'] = $_POST['image_alt'];                //Get all text
 
         //Validate image file
-        $errors['image_file'] = in_array(mime_content_type($temp), $file_types) ? '': 'Wrong file type. '; // Check file type
+        $errors['image_file'] = in_array(mime_content_type($temp), MEDIA_TYPES) ? '': 'Wrong file type. '; // Check file type
         $extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION)); // File extension in lowercase
-        $errors['image_file'] .= in_array($extension, $file_extensions) ? '' : 'Wrong file extension. '; //Check file extension
-        $errors['image_file'] .= ($_FILES['image']['size'] <= $max_size) ? '' : 'File too big. ';       //Check size
-        $errors['image_alt'] = (is_text($article['image_alt'], 1, 254)) ? '' : 'Alt text must be 1-254 characters.'; //Check alt text
+        $errors['image_file'] .= in_array($extension,FILE_EXTENSIONS) ? '' : 'Wrong file extension. '; //Check file extension
+        $errors['image_file'] .= ($_FILES['image']['size'] <= MAX_SIZE) ? '' : 'File too big. ';       //Check size
+        $errors['image_alt'] = (Validate::isText($article['image_alt'], 1, 254)) ? '' : 'Alt text must be 1-254 characters.'; //Check alt text
 
         // If image file is valid, specify the location to save it
         if($errors['image_file'] === '' and $errors['image_alt'] === '') { //If valid
-            $article['image_file'] = create_filename($_FILES['image']['name'], $uploads);
-            $destination = $uploads . $article['image_file'];
+            $article['image_file'] = create_filename($_FILES['image']['name'], UPLOADS);
+            $destination = UPLOADS . $article['image_file'];
         }
 
     }
@@ -111,11 +82,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
     $article['published']  = (isset($_POST['published']) and ($_POST['published'] == 1)) ? 1 : 0; //Is it published?
 
     // Validate article data and create error messages if it is invalid
-    $errors['title'] = is_text($article['title'], 1, 80) ? '' : 'Title must be 1-80 characters';
-    $errors['summary'] = is_text($article['summary'], 1, 254) ? '' : 'Summary must be 1-254 characters';
-    $errors['content'] = is_text($article['content'], 1, 100000) ? '' : 'Article must be 1-100,000 characters';
-    $errors['member'] = is_member_id($article['member_id'], $authors  ) ? '' : 'Please select an author';
-    $errors['category'] = is_category_id($article['category_id'], $categories) ? '' : 'Please select a category';
+    $errors['title'] = Validate::isText($article['title'], 1, 80) ? '' : 'Title must be 1-80 characters';
+    $errors['summary'] = Validate::isText($article['summary'], 1, 254) ? '' : 'Summary must be 1-254 characters';
+    $errors['content'] = Validate::isText($article['content'], 1, 100000) ? '' : 'Article must be 1-100,000 characters';
+    $errors['member'] = Validate::isMemberId($article['member_id'], $authors  ) ? '' : 'Please select an author';
+    $errors['category'] = Validate::isCategoryId($article['category_id'], $categories) ? '' : 'Please select a category';
 
     $invalid = implode($errors);                                        // Join errors
     //Part C: Check if data is valid, if so update database
@@ -123,55 +94,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
         $errors['warning'] = 'Please correct the errors below';  //Store message
     } else {                                                     //otherwise
         $arguments = $article;                                  //Save data as $arguments
-        try {                                                   //Try to insert data
-            $pdo->beginTransaction();                           //Start transaction
-            if($destination) {                                  //If have valid image
-                // Crop and save file
-                $imagick = new Imagick($temp);                  //Object to represent image
-                $imagick->cropThumbnailImage(1200, 700);  //Create cropped image
-                $imagick->writeImage($destination);                 //Save file
 
-                $sql = "INSERT INTO image(file, alt) VALUES(:file, :alt)"; //SQL to add image
+        if($id) {
+            $saved = $cms->getArticle()->update($arguments, $temp, $destination);  //Update article
+        } else {
+            unset($arguments['id']);
 
-                // Run SQL to add image to image table
-                pdo($pdo, $sql, [$arguments['image_file'], $arguments['image_alt'], ]);
-                $arguments['image_id'] = $pdo->lastInsertId();
-            }
-            unset($arguments['image_file'], $arguments['image_alt']); //Cut image data
-
-            if($id) {
-                $sql = "UPDATE article 
-                            SET title = :title, summary = :summary, content = :content, 
-                                category_id = :category_id, member_d = :member_id, 
-                                image_id = :image_id, published =:published
-                         WHERE id=:id;";                            //SQL to update article
-            } else {
-                unset($arguments['id']);
-                $sql = "INSERT INTO article(title, summary, content, category_id, 
-                                    member_id, image_id, published)
-                              VALUES(:title, :summary, :content, :category_id, :member_id, 
-                                     :image_id, :published);";          //SQL to create article
-            }
-
-
-            // When running the SQL, three things can happen:
-            // Article saved | Title already in use | Exception thrown for other reason
-            pdo($pdo, $sql, $arguments);            // Run SQL to add article
-            $pdo->commit();
-            //Commit changes
-            redirect('articles.php', ['success' => 'Article saved']); //Redirect
-        } catch(Exception $e) {                                     //If exception thrown
-            $pdo->rollBack();                                       //Roll back SQL changes
-            if(file_exists($destination)){
-                unlink($destination);
-            }
-            // If the exception was a PDOException and it was an integrity constraint
-            if(($e instanceof PDOException) and ($e->errorInfo[1] === 1062)) {
-               $errors['warning'] = 'Article name already in use';      //Store warning
-            }else {                                                     //Otherwise
-                throw $e;                                               //Rethrow exception
-            }
+            $saved = $cms->getArticle()->create($arguments, $temp, $destination); //Create article
         }
+
+        if($saved == true) {                                                  //If updated
+            redirect('admin/articles.php' , ['success' => 'Article saved']); //Redirect
+        } else {                                                            //Otherwise
+            $errors['warning'] = 'Article title already in use';            //Store message
+        }
+
     }
 
     $article['image_file'] = $saved_image ? $article['image_file'] : '';
@@ -259,7 +196,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
                     <span class="errors"><?= $errors['category'] ?></span>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" name="published" value="1" class="form-check-input" id="published">
+                    <input type="checkbox" name="published" value="1" class="form-check-input" id="published"
+                    <?= ($article['published'] == 1) ? 'checked' : '';?>>
                     <label for="published" class="form-check-label">Published</label>
                 </div>
                 <input type="submit" name="update" value="Save" class="btn btn-primary">
