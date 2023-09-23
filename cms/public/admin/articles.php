@@ -4,19 +4,6 @@ include '../../src/bootstrap.php';                       // Include setup file
 
 $success = $_GET['success'] ?? null;          //Check for success message
 $failure = $_GET['failure'] ?? null;           //Check for failure message
-
-/*$sql = "SELECT a.id, a.title, a.summary, a.created, a.category_id, a.member_id, a.published,
-                c.name     AS category,
-                CONCAT(m.forename, ' ',m.surname) AS author,
-                i.file    AS image_file,
-                i.alt      AS image_alt
-           FROM article    AS a
-           JOIN category   AS c ON a.category_id = c.id
-           JOIN member     AS m ON a.member_id = m.id
-           LEFT JOIN image AS i ON a.image_id  =i.id
-           ORDER BY a.id DESC;";                //SQL to get article summaries
-$articles = pdo($p
-*/
 $articles = $cms->getArticle()->getAll(0);               //Get article summaries
 
 ?>
