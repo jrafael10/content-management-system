@@ -1,41 +1,38 @@
 <?php
 declare(strict_types=1);                        //Use strict types
-include '../includes/database-connection.php';  //Database connection
-include '../includes/functions.php';            //Include functions
+include '../../src/bootstrap.php';                        // Include setup file
+
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); //Get and validate id
-$category = '';                                 //Initialize category name
+$category = [];                                 //Initialize category arrray
+$deleted = null;                                //Did category delete
 
 if(!$id) {                                      //If no valid id
-   // redirect('categories.php',['failure' => 'Category not found'] ); //Redirect with error
+    redirect('categories.php',['failure' => 'Category not found'] ); //Redirect with error
 }
 
-$sql = "SELECT name FROM category WHERE id = :id;";     //SQL to get category name
-$category = pdo($pdo, $sql, [$id])->fetchColumn();      //Get category names
-
-
-if(!$category) {                                        //if no category
-   // redirect('categories.php', ['failure' => 'Category not found']); //Redirect with error
+$category = $cms->getCategory()->get($id);          //Get categgpry
+if(!$category) {                                        //if valid id
+   redirect('categories.php', ['failure' => 'Category not found']); //Redirect with error
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
+    if($id) {
+        $deleted = $cms->getCategory()->delete($id); // DElete category
+        if($deleted === true) {
+            redirect('admin/categories.php', ['success' => 'Category deleted']); //Redirect with error
 
-    try{                                                //Try to delete data
-            $sql = "DELETE FROM category WHERE id = :id;";
-            pdo($pdo, $sql, [$id]);
-            redirect('categories.php', ['success' => 'Category deleted']);  //Redirect
-        } catch(PDOException $e) {                              //Catch exception
-            if($e->errorInfo[1] === 1451) {                     //If integrity constraint
-                redirect('categories.php', ['failure' => 'Category contains articles that must be moved or
-                deleted before you can delete it']); //Redirect
-            } else {                        //Otherwise
-                throw $e;                   //Rethrow exception
-            }
         }
+        if($deleted == false ) {                //If contains articles
+            redirect('admin/categpries.php' , ['failure' => 'Category contains articles that
+            must be moved or deleted before you can delete the category']); //Redirect
+        }
+    }
+
 }
 ?>
 
-<?php include '../includes/admin-header.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-header.php'; ?>
     <main class="container admin" id="content">
         <form action="category-delete.php?id=<?= $id ?>" method="POST" class="narrow">
             <h1>Delete Category</h1>
@@ -44,4 +41,4 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
             <a href="categories.php" class="btn btn-danger">Cancel</a>
         </form>
     </main>
-<?php include '../includes/admin-footer.php'; ?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; ?>

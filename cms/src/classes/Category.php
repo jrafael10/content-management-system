@@ -71,4 +71,26 @@ class Category
             }
         }
     }
+
+    //Delete existing category
+    public function delete (int $id): bool
+    {
+        try {                                       // Try to delete category
+            $sql ="DELETE FROM category            
+                   WHERE id = :id;";                // SQL to delete category
+            $this->db->runSQL($sql, [$id]);         // Delete category
+            return true;                            // It worked, return true
+        }catch(PDOException $e) {                   // If an exception was thrown
+            if($e->errorInfo[1] === 1451){          //If integrity constraint
+                return false;                       //Return false
+
+            } else {                                //if any other exception
+                throw $e;                           //Re-throw exception
+
+            }
+
+
+        }
+    }
+
 }
