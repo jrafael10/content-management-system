@@ -1,6 +1,8 @@
 <?php
 namespace Cms\CMS;
 
+use Imagick;
+
 class Article
 {
     protected $db;                  //Holds ref to Database object

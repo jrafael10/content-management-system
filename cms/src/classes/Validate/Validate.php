@@ -1,5 +1,5 @@
 <?php
-
+namespace Cms\Validate;
 class Validate
 {
     public static function isNumber($number, $min = 0, $max = 100):bool

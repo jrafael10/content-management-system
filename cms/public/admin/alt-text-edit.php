@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);            //Use strict types
+use Cms\Validate\Validate;
 include '../../src/bootstrap.php'; //Include setup files
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); //Get and validate id
 $article = [];                     //Initialize article array

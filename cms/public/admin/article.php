@@ -2,6 +2,7 @@
 
 //Part A: Setup
 declare(strict_types = 1);//Use strict types
+use Cms\Validate\Validate;
 include '../../src/bootstrap.php';      //Include setup file
 
 // Initialize variables that the PHP code needs

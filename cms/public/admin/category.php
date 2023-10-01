@@ -1,6 +1,7 @@
 <?php
 // setup
 declare(strict_types=1);
+use Cms\Validate\Validate;
 include '../../src/bootstrap.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Get id and validate
@@ -54,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {  //If form submitted
         }
 
         if($saved === true) {
-            redirect('admin/categories.php', ['success' => 'Categpry saved']); //Redirect
+            redirect('admin/categories.php', ['success' => 'Category saved']); //Redirect
         }
 
         if($saved === false) {                                  //If duplicate category
