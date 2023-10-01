@@ -15,30 +15,6 @@ if (!$article) {                                          // If $article empty
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
-    /*try {
-        $pdo->beginTransaction();                   //Start transaction
-
-        // If there is an image, delete the image first
-        if($article['image_id']) {                                          // If there was an image
-            $sql = "UPDATE article SET image_id = null WHERE id = :article_id;"; //SQL to update article table
-            pdo($pdo, $sql, [$id] );                                        //Remove image from article
-            $sql = "DELETE FROM image WHERE id = :id;";                     //SQL to delete from image table
-            pdo($pdo, $sql, [$article['image_id']]);                        //Delete from image table
-            $path = '../uploads/' .$article['image_file'];                  //Set the image path
-            if(file_exists($path)) {                                        //If image file exists
-                $unlink = unlink($path);                                // DElete image file
-            }
-        }
-        $sql = "DELETE FROM article WHERE id = :id;";            //SQL to delete article
-        pdo($pdo, $sql, [$id]);                                 //Delete article
-        $pdo->commit();                                         //Commit transaction
-        redirect('articles.php', ['success' => 'Article deleted']); //Redirect
-    } catch (PDOException $e) {                                 //If exception thrown
-        $pdo->rollBack();                                       //Roll back SQL changes
-        throw $e;                                               //Re-throw exception
-    }
-    */
-
     if(isset($article['image_id'])) {                                 // If there was an image
         $path = APP_ROOT . '/public/uploads/' . $article['image_file'];  //Set the image path
         $cms->getArticle()->imageDelete($article['image_id'], $path, $id);  //Delete image

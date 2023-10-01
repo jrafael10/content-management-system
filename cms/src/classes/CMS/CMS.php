@@ -1,5 +1,5 @@
 <?php
-
+namespace Cms\CMS;
 class CMS
 {
     protected $db = null;           //Stores reference to Database object
