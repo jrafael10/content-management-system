@@ -75,13 +75,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
     }
 
     //Get article data
-    $article['title'] = $_POST['title'];
-    $article['summary'] = $_POST['summary'];
-    $article['content'] = $_POST['content'];
-    $article['member_id'] = $_POST['member_id'];
-    $article['category_id'] = $_POST['category_id'];
-    $article['published']  = (isset($_POST['published']) and ($_POST['published'] == 1)) ? 1 : 0; //Is it published?
+    $article['title'] = $_POST['title'];                            //Get title
+    $article['summary'] = $_POST['summary'];                        // Get summary
+    $article['content'] = $_POST['content'];                        // Get content
+    $article['member_id'] = $_POST['member_id'];                    // Get member_id
+    $article['category_id'] = $_POST['category_id'];                // Get category_id
+    $article['published']  = (isset($_POST['published']) and ($_POST['published'] == 1)) ? 1 : 0; // Get navigation
 
+    $purifier = new HTMLPurifier();
+    $purifier->config->set('HTML.Allowed', 'p,br,strong,em,a[href],img[src|alt]'); //Allowed tags and attributes
+    $article['content'] = $purifier->purify($article['content']);
     // Validate article data and create error messages if it is invalid
     $errors['title'] = Validate::isText($article['title'], 1, 80) ? '' : 'Title must be 1-80 characters';
     $errors['summary'] = Validate::isText($article['summary'], 1, 254) ? '' : 'Summary must be 1-254 characters';
@@ -165,7 +168,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') { //If form submitted
                 <div class="form-group">
                     <label for="content">Content: </label>
                     <textarea name="content" id="content"
-                              class="form-control"><?= html_escape($article['content']) ?></textarea>
+                              class="form-control"><?= $article['content'] ?></textarea>
                     <span class="errors"><?= $errors['content'] ?></span>
                 </div>
                 <div class="form-group">

@@ -1,11 +1,12 @@
 {
     "require": {
-        "ezyang/htmlpurifier": "^4.16"
+        "ezyang/htmlpurifier": "^4.16",
+        "twig/twig": "^3.7"
     },
 
     "autoload" : {
         "psr-4" : {
-            "Cms\\" : "src/classes/"
+            "Cms\\" : "src/classes/ "
         }
     }
 }
