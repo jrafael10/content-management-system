@@ -1,2 +1,4 @@
 #Ignore vendore directory
 /cms/vendor
+/cms/var/cache/*
+!/cms/var/cache/.gitkeep

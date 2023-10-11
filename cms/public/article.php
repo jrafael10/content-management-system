@@ -8,36 +8,19 @@ if(!$id) {                                          //if no valid id
     include APP_ROOT . '/public/page-not-found.php'; //Page not found
 }
 
+
 $article = $cms->getArticle()->get($id);            //Get article data
 if(!$article) {                                     //If article not found
     include APP_ROOT . '/public/page-not-found.php'; //Page not found
 }
 
-$navigation = $cms->getCategory()->getAll();            // Get categories
-$section = $article['category_id'];                     //current category
-$title = $article['title'];                             //HTML <title> content
-$description = $article['summary'];                      //Meta description content
+$data['navigation'] = $cms->getCategory()->getAll();            // Get categories
+$data['article'] = $article;                                    //Article
+$data['section'] = $article['category_id'];                     //current category
+
+echo $twig->render('article.html', $data);              //Render template
 ?>
-<?php include 'includes/header.php'; ?>
 
-
-<main class="article container" id="content">
-    <section class="image">
-        <img src="uploads/<?= html_escape($article['image_file'] ?? 'blank.png') ?>"
-             alt="<?= html_escape($article['image_alt']) ?>">
-    </section>
-    <section class="text">
-        <h1><?= html_escape($article['title']) ?></h1>
-        <div class="date"><?= format_date($article['created']) ?></div>
-        <div class="content"><?= html_escape($article['content']) ?></div>
-        <p class="credit">
-            Posted in <a href="category.php?id=<?= $article['category_id'] ?>"><?= html_escape($article['category']) ?></a>by <a href="member.php?id=<?= $article['member_id'] ?>">
-                <?= html_escape($article['author']) ?></a>
-        </p>
-    </section>
-</main>
-
-<?php include 'includes/footer.php'; ?>
 
 
 
