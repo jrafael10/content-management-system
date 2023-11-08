@@ -36,7 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {          //If form was submitted
     <main class="container admin" id="content">
         <form action="category-delete.php?id=<?= $id ?>" method="POST" class="narrow">
             <h1>Delete Category</h1>
-            <p>Click confirm to delete the category: <em><?= html_escape($category) ?></em></p>
+            <p>Click confirm to delete the category: <em><?= html_escape($category['name']) ?></em></p>
             <input type="submit" name="delete" value="Confirm" class="btn btn-primary">
             <a href="categories.php" class="btn btn-danger">Cancel</a>
         </form>

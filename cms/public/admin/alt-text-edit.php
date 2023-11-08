@@ -32,9 +32,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {              //If form was submitted
     }
 }
 
+$data['article'] = $article;
+$data['errors'] = $errors;
+
+echo $twig->render('admin/alt-text-edit.html', $data); //  Render template
+
 ?>
 
-<?php include APP_ROOT . '/public/includes/admin-header.php';?>
+<?php /*include APP_ROOT . '/public/includes/admin-header.php';?>
     <main class="container admin" id="content">
         <form action="alt-text-edit.php?id=<?= $id ?>" method="POST" class="narrow">
             <h1>Update Alt Text</h1>
@@ -52,6 +57,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {              //If form was submitted
             <img src="../uploads/<?= html_escape($article['image_file']) ?>" alt="<?= $article['image_alt'] ?>">
         </form>
     </main>
-<?php include APP_ROOT . '/public/includes/admin-footer.php';?>
+<?php include APP_ROOT . '/public/includes/admin-footer.php'; */?>
 
 

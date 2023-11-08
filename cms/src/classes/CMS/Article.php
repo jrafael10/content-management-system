@@ -218,8 +218,6 @@ class Article
         }
     }
 
-
-
     public function altUpdate(int $image_id, string $alt)
     {
         $sql = "UPDATE image SET alt = :alt
