@@ -39,24 +39,5 @@ echo $twig->render('admin/alt-text-edit.html', $data); //  Render template
 
 ?>
 
-<?php /*include APP_ROOT . '/public/includes/admin-header.php';?>
-    <main class="container admin" id="content">
-        <form action="alt-text-edit.php?id=<?= $id ?>" method="POST" class="narrow">
-            <h1>Update Alt Text</h1>
-            <?php if($errors['warning']) {?><div class="alert alert-danger"><?=$errors['warning']?></div><?php } ?>
-            <div class="form-group">
-                <label for="image_alt">Alt text: </label>
-                <input type="text" name="image_alt" id="image_alt" value="<?= html_escape($article['image_alt']) ?>" class="form-control">
-                <span class="errors"> <?= $errors['alt'] ?></span>
-            </div>
-
-            <div class="form-group">
-                <input type="submit" name="delete" value="Update" class="btn btn-primary btn-save">
-            </div>
-
-            <img src="../uploads/<?= html_escape($article['image_file']) ?>" alt="<?= $article['image_alt'] ?>">
-        </form>
-    </main>
-<?php include APP_ROOT . '/public/includes/admin-footer.php'; */?>
 
 

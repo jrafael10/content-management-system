@@ -20,6 +20,19 @@ $password = 'duckett101';    // Enter YOUR password here
 //DO NOT CHANGE NEXT LINE
 $dsn = "$type:host=$server;dbname=$db;port=$port;charset=$charset"; //Create DSN
 
+// SMTP server settings - ENTER YOUR DETAILS HERE
+
+$email_config = [
+  'server' => '',
+  'port'   => '',
+  'username' => '',
+  'password' => '',
+  'security' => '',
+  'admin_email' => '',
+  'debug' => (DEV) ? 2 : 0,
+];
+
+
 //File upload settings
 define('UPLOADS', dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR); //Image upload folder
 define('MEDIA_TYPES', ['image/jpeg', 'image/png', 'image/gif', ]); // Allowed file types
