@@ -23,13 +23,13 @@ $dsn = "$type:host=$server;dbname=$db;port=$port;charset=$charset"; //Create DSN
 // SMTP server settings - ENTER YOUR DETAILS HERE
 
 $email_config = [
-  'server' => '',
-  'port'   => '',
-  'username' => '',
-  'password' => '',
-  'security' => '',
-  'admin_email' => '',
-  'debug' => (DEV) ? 2 : 0,
+  'server' => 'sandbox.smtp.mailtrap.io',
+  'port'   => '2525',
+  'username' => 'fb2efe083ce9b1',
+  'password' => '5722f0c99617e4',
+  'security' => 'tls',
+  'admin_email' => 'jesserafael102193@gmail.com',
+  'debug' => 0,// (DEV) ? 2 : 0, // 0 for now for testing purposes.
 ];
 
 
