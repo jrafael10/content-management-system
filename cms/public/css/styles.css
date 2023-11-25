@@ -498,7 +498,7 @@ textarea#content {
     min-height: 12rem;
 }
 
-.narrow {
+.form-membership, .form-contact, .narrow {
     max-width: 500px;
     margin: 0 auto;
 }

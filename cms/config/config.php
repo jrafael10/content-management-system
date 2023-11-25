@@ -20,6 +20,19 @@ $password = 'duckett101';    // Enter YOUR password here
 //DO NOT CHANGE NEXT LINE
 $dsn = "$type:host=$server;dbname=$db;port=$port;charset=$charset"; //Create DSN
 
+// SMTP server settings - ENTER YOUR DETAILS HERE
+
+$email_config = [
+  'server' => 'sandbox.smtp.mailtrap.io',
+  'port'   => '2525',
+  'username' => 'fb2efe083ce9b1',
+  'password' => '5722f0c99617e4',
+  'security' => 'tls',
+  'admin_email' => 'jesserafael102193@gmail.com',
+  'debug' => 0,// (DEV) ? 2 : 0, // 0 for now for testing purposes.
+];
+
+
 //File upload settings
 define('UPLOADS', dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR); //Image upload folder
 define('MEDIA_TYPES', ['image/jpeg', 'image/png', 'image/gif', ]); // Allowed file types

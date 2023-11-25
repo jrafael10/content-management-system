@@ -13,6 +13,11 @@ class Validate
         return ($length >= $min and $length <=$max);
     }
 
+    public static function isEmail($email): bool
+    {
+        return (filter_var($email, FILTER_VALIDATE_EMAIL)) ? true : false;
+    }
+
     public static function isMemberId($member_id, array $member_list):bool
     {
         foreach ($member_list as $member) {
@@ -32,5 +37,9 @@ class Validate
         }
         return false;
     }
+
+
+
+
 
 }
